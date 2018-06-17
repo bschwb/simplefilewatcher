@@ -4,15 +4,15 @@ if(WIN32)
 		FileWatcherWin32.cpp
 	)	
 	add_definitions(-DMINGINE_WIN32)
-elseif(UNIX)
-	set(SFW_SOURCES 
-		FileWatcher.cpp
-		FileWatcherLinux.cpp
-	)
 elseif(APPLE)
 	set(SFW_SOURCES 
 		FileWatcher.cpp
 		FileWatcherOSX.cpp
+	)
+elseif(UNIX)
+	set(SFW_SOURCES 
+		FileWatcher.cpp
+		FileWatcherLinux.cpp
 	)
 endif()
 
