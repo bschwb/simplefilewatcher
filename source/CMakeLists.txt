@@ -1,10 +1,4 @@
-set(SFW_SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR})
-
-file(
-	GLOB_RECURSE SFW_INCLUDES 
-	"${SFW_INCLUDE_DIR}/*.h"
-	"${SFW_INCLUDE_DIR}/*.h"
-)
+cmake_minimum_required(VERSION 3.2 FATAL_ERROR)
 
 if (WIN32)
 	set(
@@ -12,23 +6,19 @@ if (WIN32)
 		"${CMAKE_CURRENT_SOURCE_DIR}/FileWatcher.cpp"
 		"${CMAKE_CURRENT_SOURCE_DIR}/FileWatcherWin32.cpp"
 	)
-ELSEIF(UNIX)
-	set(
-		SFW_SOURCES 
-		"${CMAKE_CURRENT_SOURCE_DIR}/FileWatcher.cpp"
-		"${CMAKE_CURRENT_SOURCE_DIR}/FileWatcherLinux.cpp"
-	)
 ELSEIF(APPLE)
 	set(
-		SFW_SOURCES 
+		SFW_SOURCES
 		"${CMAKE_CURRENT_SOURCE_DIR}/FileWatcher.cpp"
 		"${CMAKE_CURRENT_SOURCE_DIR}/FileWatcherOSX.cpp"
 	)
+ELSEIF(UNIX)
+	set(
+		SFW_SOURCES
+		"${CMAKE_CURRENT_SOURCE_DIR}/FileWatcher.cpp"
+		"${CMAKE_CURRENT_SOURCE_DIR}/FileWatcherLinux.cpp"
+	)
 ENDIF()
 
-add_library(sfw_lib STATIC ${SFW_SOURCES} ${SFW_INCLUDES})
-target_include_directories(
-	sfw_lib
-	PUBLIC
-	${SFW_INCLUDE_DIR}
-)
+include_directories(${SFW_INCLUDE_DIR})
+add_library(sfw_lib ${SFW_SOURCES})
