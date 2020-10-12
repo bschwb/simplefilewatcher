@@ -27,6 +27,40 @@
 #define _WIN32_WINNT 0x0550
 #include <windows.h>
 
+#ifdef WIN_USE_WSTR
+typedef std::wstring WAPI_STR;
+#else
+typedef std::string WAPI_STR;
+#endif
+
+WAPI_STR to_w_str(const std::string& str)
+{
+#ifdef WIN_USE_WSTR
+	WAPI_STR ret(str.length(), '0');
+	
+	for (size_t i = 0; i < str.length(); ++i)
+		ret[i] = str[i];
+
+	return ret;
+#else
+	return str;
+#endif
+}
+
+std::string to_str(const WAPI_STR& str)
+{
+#ifdef WIN_USE_WSTR
+	std::string ret(str.length(), '0');
+
+	for (size_t i = 0; i < str.length(); ++i)
+		ret[i] = (char)str[i];
+
+	return ret;
+#else
+	return str;
+#endif
+}
+
 #if defined(_MSC_VER)
 #pragma comment(lib, "comctl32.lib")
 #pragma comment(lib, "user32.lib")
@@ -49,8 +83,7 @@ namespace FW
 		bool mStopNow;
 		FileWatcherImpl* mFileWatcher;
 		FileWatchListener* mFileWatchListener;
-		TCHAR* mDirName;
-
+		char* mDirName;
 		WatchID mWatchid;
 		bool mIsRecursive;
 	};
@@ -64,6 +97,7 @@ namespace FW
 	void CALLBACK WatchCallback(DWORD dwErrorCode, DWORD dwNumberOfBytesTransfered, LPOVERLAPPED lpOverlapped)
 	{
 		TCHAR szFile[MAX_PATH];
+		
 		PFILE_NOTIFY_INFORMATION pNotify;
 		WatchStruct* pWatch = (WatchStruct*) lpOverlapped;
 		size_t offset = 0;
@@ -92,7 +126,7 @@ namespace FW
 				}
 #			endif
 
-				pWatch->mFileWatcher->handleAction(pWatch, szFile, pNotify->Action);
+				pWatch->mFileWatcher->handleAction(pWatch, to_str(szFile).c_str(), pNotify->Action);
 
 			} while (pNotify->NextEntryOffset != 0);
 		}
@@ -129,7 +163,7 @@ namespace FW
 
 			CloseHandle(pWatch->mOverlapped.hEvent);
 			CloseHandle(pWatch->mDirHandle);
-			delete [] pWatch->mDirName;
+			delete pWatch->mDirName;
 			HeapFree(GetProcessHeap(), 0, pWatch);
 		}
 	}
@@ -191,8 +225,8 @@ namespace FW
 	{
 		WatchID watchid = ++mLastWatchID;
 
-		WatchStruct* watch = CreateWatch(directory.c_str(), recursive,
-			FILE_NOTIFY_CHANGE_CREATION | FILE_NOTIFY_CHANGE_SIZE | FILE_NOTIFY_CHANGE_FILE_NAME | FILE_NOTIFY_CHANGE_LAST_WRITE);
+		WatchStruct* watch = CreateWatch(to_w_str(directory).c_str(), recursive,
+			FILE_NOTIFY_CHANGE_CREATION | FILE_NOTIFY_CHANGE_SIZE | FILE_NOTIFY_CHANGE_FILE_NAME);
 
 		if(!watch)
 			throw FileNotFoundException(directory);
@@ -200,8 +234,8 @@ namespace FW
 		watch->mWatchid = watchid;
 		watch->mFileWatcher = this;
 		watch->mFileWatchListener = watcher;
-		watch->mDirName = new TCHAR[directory.length()+1];
-		std::memcpy(watch->mDirName, directory.c_str(), (directory.length() + 1) * sizeof(TCHAR));
+		watch->mDirName = new char[directory.length()+1];
+		strcpy(watch->mDirName, directory.c_str());
 
 		mWatches.insert(std::make_pair(watchid, watch));
 

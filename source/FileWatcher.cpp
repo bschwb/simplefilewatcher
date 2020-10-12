@@ -80,4 +80,14 @@ namespace FW
 		mImpl->update();
 	}
 
+	void SingleThreadedPollingFileWatcher::Listener::handleFileAction(WatchID watchid, const String& dir, const String& filename, Action action)
+	{
+		FileWatcherEvent ev;
+		ev.id = watchid;
+		ev.dir = dir;
+		ev.filename = filename;
+		ev.action = action;
+		m_watcher.m_events.push(ev);
+	}
+
 };//namespace FW
