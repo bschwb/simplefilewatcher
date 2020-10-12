@@ -1,0 +1,5 @@
+## CUSTOM IGNORES
+bin
+build
+buildcfg
+lib

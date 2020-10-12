@@ -29,6 +29,7 @@
 #define _FW_FILEWATCHERWIN32_H_
 #pragma once
 
+#include <unordered_map>
 #include "FileWatcherImpl.h"
 
 #if FILEWATCHER_PLATFORM == FILEWATCHER_PLATFORM_WIN32
@@ -43,7 +44,7 @@ namespace FW
 	{
 	public:
 		/// type for a map from WatchID to WatchStruct pointer
-		typedef std::map<WatchID, WatchStruct*> WatchMap;
+		typedef std::unordered_map<WatchID, WatchStruct*> WatchMap;
 
 	public:
 		///
