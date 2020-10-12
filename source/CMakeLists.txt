@@ -1,24 +1,24 @@
-cmake_minimum_required(VERSION 3.2 FATAL_ERROR)
-
-if (WIN32)
-	set(
-		SFW_SOURCES
-		"${CMAKE_CURRENT_SOURCE_DIR}/FileWatcher.cpp"
-		"${CMAKE_CURRENT_SOURCE_DIR}/FileWatcherWin32.cpp"
+if(WIN32)
+	set(SFW_SOURCES
+		FileWatcher.cpp
+		FileWatcherWin32.cpp
+	)	
+	add_definitions(-DMINGINE_WIN32)
+elseif(APPLE)
+	set(SFW_SOURCES 
+		FileWatcher.cpp
+		FileWatcherOSX.cpp
 	)
-ELSEIF(APPLE)
-	set(
-		SFW_SOURCES
-		"${CMAKE_CURRENT_SOURCE_DIR}/FileWatcher.cpp"
-		"${CMAKE_CURRENT_SOURCE_DIR}/FileWatcherOSX.cpp"
+elseif(UNIX)
+	set(SFW_SOURCES 
+		FileWatcher.cpp
+		FileWatcherLinux.cpp
 	)
-ELSEIF(UNIX)
-	set(
-		SFW_SOURCES
-		"${CMAKE_CURRENT_SOURCE_DIR}/FileWatcher.cpp"
-		"${CMAKE_CURRENT_SOURCE_DIR}/FileWatcherLinux.cpp"
-	)
-ENDIF()
+endif()
 
 include_directories(${SFW_INCLUDE_DIR})
 add_library(sfw_lib ${SFW_SOURCES})
+
+target_include_directories(sfw_lib PUBLIC
+	${SFW_INCLUDE_DIR}
+)
