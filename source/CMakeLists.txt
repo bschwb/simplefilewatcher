@@ -3,7 +3,6 @@ if(WIN32)
 		FileWatcher.cpp
 		FileWatcherWin32.cpp
 	)	
-	add_definitions(-DMINGINE_WIN32)
 elseif(APPLE)
 	set(SFW_SOURCES 
 		FileWatcher.cpp
@@ -16,9 +15,8 @@ elseif(UNIX)
 	)
 endif()
 
-include_directories(${SFW_INCLUDE_DIR})
 add_library(sfw_lib ${SFW_SOURCES})
-
+target_compile_features(sfw_lib PUBLIC cxx_std_11)
 target_include_directories(sfw_lib PUBLIC
 	${SFW_INCLUDE_DIR}
 )
